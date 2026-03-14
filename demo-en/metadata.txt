@@ -1,0 +1,6 @@
+Index	Original_ID	Text
+0	common_voice_en_21444162-common_voice_en_21444161.wav	It is operated by the New York City Department of Parks and Recreation.
+2	common_voice_en_23763831-common_voice_en_23763836.wav	While at Cambridge he also gained experience in using the telegraph.
+5	common_voice_en_20042516-common_voice_en_20042515.wav	Next was "The Last King of Scotland", which won an Oscar for best actor.
+6	common_voice_en_699384-common_voice_en_699386.wav	Dense clouds of smoke or dust can be seen through a powerful telescope.
+8	common_voice_en_20190570-common_voice_en_20190568.wav	The bridge is located just west of Commodore Park.

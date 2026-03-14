@@ -1,1 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TC-DBI: A Plug-and-Play Trajectory Confidence-Guided Dynamic Block Inference Strategy for Speech Synthesis with Continuous Block Flow Matching</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px; /* 稍微加宽一点以适应6列 */
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        h1 {
+            margin-top: 0;
+            font-size: 2.2em;
+            line-height: 1.3;
+        }
+        h3 {
+            text-align: left;
+            margin-top: 40px;
+            margin-bottom: -10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        .figure-caption {
+            text-align: justify;
+            margin-top: 20px;
+            padding: 0 20px;
+            color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border: none;
+            table-layout: fixed; /* 固定列宽，防止因为文本过长导致排版变形 */
+        }
+        th, td {
+            padding: 15px 10px;
+            text-align: center;
+            vertical-align: middle;
+            border: none;
+        }
+        th {
+            background-color: #fff;
+            font-weight: bold;
+            border-bottom: 3px solid #333;
+            font-size: 1.05em;
+        }
+        .group-header {
+            text-align: left;
+            font-size: 1.1em;
+            font-weight: bold;
+            background-color: #e9ecef;
+            color: #495057;
+            border-top: 2px solid #ddd;
+            border-bottom: 2px solid #ddd;
+        }
+        tbody td {
+             border-bottom: 2px solid #eee;
+        }
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+        /* Transcript column styling */
+        #main-results-table td:first-child {
+            text-align: left;
+            font-style: italic;
+            width: 25%;
+            color: #555;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+        audio {
+            width: 100%;
+            min-width: 120px;
+        }
+        .ours-highlight {
+            background-color: #f0f7ff; /* 给Ours的模型稍微加一点底色突出 */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
 
+    <div class="container">
+        
+        <div style="text-align: center;">
+            <h1>TC-DBI: A Plug-and-Play Trajectory Confidence-Guided Dynamic Block Inference Strategy for Speech Synthesis with Continuous Block Flow Matching</h1>
+        </div>
+
+        <p style="text-align: justify; margin-top: 30px;">
+            <strong>Abstract:</strong> Block Flow Matching combines block-level autoregression with intra-block parallelism for efficient and high-quality Text-to-Speech (TTS). However, using a fixed block size during inference ignores the non-uniform modeling difficulty of speech, which can cause unstable velocity estimation in challenging regions. This motivates the need for a reliability metric that can guide dynamic adjustment of block size. We propose Trajectory Confidence (TC), a geometric measure derived from trajectory straightness during ODE integration, and introduce TC-Guided Dynamic Block Inference (TC-DBI), a plug-and-play strategy that truncates and regenerates unreliable regions to adapt block size without architectural changes. Experiments show that TC correlates strongly with generation errors, and TC-DBI improves robustness and perceptual quality while maintaining comparable efficiency. 
+        </p>
+
+        <h2>Model Architecture</h2>
+        <div style="text-align: center;">
+            <img src="figs/main_fig.png" alt="Model Architecture Diagram" style="max-width: 80%; border: 1px solid #ccc;">
+            <p><em>Fig. 1: An overview of our proposed model architecture.</em></p>
+        </div>
+
+        <h2>Main Results</h2>
+        <div style="text-align: center; margin-top: 20px;">
+            <img src="figs/main_results.png" alt="Main MOS scores and other metrics" style="max-width: 80%; border: 1px solid #ccc;">
+        </div>
+        <p class="figure-caption">
+            We conducted our evaluations on the seed-test-zh and seed-test-en benchmarks from Seed-TTS. Since no publicly available BFM model matches our training scale, we reproduced a Block Flow Matching model (BFM) as a baseline. For a comprehensive comparison, we also include CosyVoice2, MaskGCT, and F5-TTS, covering AR and NAR paradigms.
+        </p>
+
+        <table id="main-results-table">
+            <thead>
+                <tr>
+                    <th>文本 (Transcript)</th>
+                    <th>CosyVoice2</th>
+                    <th>F5-TTS</th>
+                    <th>MaskGCT</th>
+                    <th>BFM<br><span style="font-size: 0.8em; font-weight: normal;">(ours)</span></th>
+                    <th class="ours-highlight">BFM with TC-DBI<br><span style="font-size: 0.8em; font-weight: normal;">(ours)</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="6" class="group-header">中文 (Chinese)</td>
+                </tr>
+                <tr>
+                    <td>一个挪动一步，另一个也挪一步，可都是斜着步子兜圈子。</td>
+                    <td><audio controls src="demo-zh/cosyvoice/sample_0001.wav"></audio></td>
+                    <td><audio controls src="demo-zh/f5_tts/sample_0001.wav"></audio></td>
+                    <td><audio controls src="demo-zh/maskgct/sample_0001.wav"></audio></td>
+                    <td><audio controls src="demo-zh/ablation/sample_0001.wav"></audio></td>
+                    <td class="ours-highlight"><audio controls src="demo-zh/ours/sample_0001.wav"></audio></td>
+                </tr>
+                <tr>
+                    <td>小丁要根据现有微信截图，要回奖金的概率。</td>
+                    <td><audio controls src="demo-zh/cosyvoice/sample_0002.wav"></audio></td>
+                    <td><audio controls src="demo-zh/f5_tts/sample_0002.wav"></audio></td>
+                    <td><audio controls src="demo-zh/maskgct/sample_0002.wav"></audio></td>
+                    <td><audio controls src="demo-zh/ablation/sample_0002.wav"></audio></td>
+                    <td class="ours-highlight"><audio controls src="demo-zh/ours/sample_0002.wav"></audio></td>
+                </tr>
+                <tr>
+                    <td>关键是气质女神啊，一开始先买一部新车。</td>
+                    <td><audio controls src="demo-zh/cosyvoice/sample_0005.wav"></audio></td>
+                    <td><audio controls src="demo-zh/f5_tts/sample_0005.wav"></audio></td>
+                    <td><audio controls src="demo-zh/maskgct/sample_0005.wav"></audio></td>
+                    <td><audio controls src="demo-zh/ablation/sample_0005.wav"></audio></td>
+                    <td class="ours-highlight"><audio controls src="demo-zh/ours/sample_0005.wav"></audio></td>
+                </tr>
+                <tr>
+                    <td>你要什么有什么，那里有正装也有休闲的衣服。</td>
+                    <td><audio controls src="demo-zh/cosyvoice/sample_0008.wav"></audio></td>
+                    <td><audio controls src="demo-zh/f5_tts/sample_0008.wav"></audio></td>
+                    <td><audio controls src="demo-zh/maskgct/sample_0008.wav"></audio></td>
+                    <td><audio controls src="demo-zh/ablation/sample_0008.wav"></audio></td>
+                    <td class="ours-highlight"><audio controls src="demo-zh/ours/sample_0008.wav"></audio></td>
+                </tr>
+                <tr>
+                    <td>窗帘几乎全烧光了，挂窗帘的棍被烧得通红，四边全是火焰。</td>
+                    <td><audio controls src="demo-zh/cosyvoice/sample_0009.wav"></audio></td>
+                    <td><audio controls src="demo-zh/f5_tts/sample_0009.wav"></audio></td>
+                    <td><audio controls src="demo-zh/maskgct/sample_0009.wav"></audio></td>
+                    <td><audio controls src="demo-zh/ablation/sample_0009.wav"></audio></td>
+                    <td class="ours-highlight"><audio controls src="demo-zh/ours/sample_0009.wav"></audio></td>
+                </tr>
+
+                <tr>
+                    <td colspan="6" class="group-header">英文 (English)</td>
+                </tr>
+                <tr>
+                    <td>It is operated by the New York City Department of Parks and Recreation.</td>
+                    <td><audio controls src="demo-en/cosyvoice/sample_0000.wav"></audio></td>
+                    <td><audio controls src="demo-en/f5_tts/sample_0000.wav"></audio></td>
+                    <td><audio controls src="demo-en/maskgct/sample_0000.wav"></audio></td>
+                    <td><audio controls src="demo-en/ablation/sample_0000.wav"></audio></td>
+                    <td class="ours-highlight"><audio controls src="demo-en/ours/sample_0000.wav"></audio></td>
+                </tr>
+                <tr>
+                    <td>While at Cambridge he also gained experience in using the telegraph.</td>
+                    <td><audio controls src="demo-en/cosyvoice/sample_0002.wav"></audio></td>
+                    <td><audio controls src="demo-en/f5_tts/sample_0002.wav"></audio></td>
+                    <td><audio controls src="demo-en/maskgct/sample_0002.wav"></audio></td>
+                    <td><audio controls src="demo-en/ablation/sample_0002.wav"></audio></td>
+                    <td class="ours-highlight"><audio controls src="demo-en/ours/sample_0002.wav"></audio></td>
+                </tr>
+                <tr>
+                    <td>Next was "The Last King of Scotland", which won an Oscar for best actor.</td>
+                    <td><audio controls src="demo-en/cosyvoice/sample_0005.wav"></audio></td>
+                    <td><audio controls src="demo-en/f5_tts/sample_0005.wav"></audio></td>
+                    <td><audio controls src="demo-en/maskgct/sample_0005.wav"></audio></td>
+                    <td><audio controls src="demo-en/ablation/sample_0005.wav"></audio></td>
+                    <td class="ours-highlight"><audio controls src="demo-en/ours/sample_0005.wav"></audio></td>
+                </tr>
+                <tr>
+                    <td>Dense clouds of smoke or dust can be seen through a powerful telescope.</td>
+                    <td><audio controls src="demo-en/cosyvoice/sample_0006.wav"></audio></td>
+                    <td><audio controls src="demo-en/f5_tts/sample_0006.wav"></audio></td>
+                    <td><audio controls src="demo-en/maskgct/sample_0006.wav"></audio></td>
+                    <td><audio controls src="demo-en/ablation/sample_0006.wav"></audio></td>
+                    <td class="ours-highlight"><audio controls src="demo-en/ours/sample_0006.wav"></audio></td>
+                </tr>
+                <tr>
+                    <td>The bridge is located just west of Commodore Park.</td>
+                    <td><audio controls src="demo-en/cosyvoice/sample_0008.wav"></audio></td>
+                    <td><audio controls src="demo-en/f5_tts/sample_0008.wav"></audio></td>
+                    <td><audio controls src="demo-en/maskgct/sample_0008.wav"></audio></td>
+                    <td><audio controls src="demo-en/ablation/sample_0008.wav"></audio></td>
+                    <td class="ours-highlight"><audio controls src="demo-en/ours/sample_0008.wav"></audio></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+</body>
+</html>
